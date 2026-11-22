@@ -32,7 +32,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation"
 import { toast } from "../ui/toast"
 import { title } from "process"
 
@@ -137,7 +137,7 @@ export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState("")
-  const router =useRouter()
+  const router = useRouter()
 
   const updateField = <K extends keyof FormValues>(
     key: K,
@@ -166,8 +166,15 @@ export function SignInForm() {
     setIsSubmitting(true)
 
     try {
-      // TODO: wire up Better Auth sign-in here    
-      toast.add({title:`hello,${values.email}`, description:"sign-in successfull"})
+      // TODO: wire up Better Auth sign-in here  
+      const { data, error } = await authClient.signIn.email({
+        email: values.email.trim().toLowerCase() as string, // required, The email address of the user.
+        password: values.password as string, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
+        rememberMe: values.remember, // If false, the user will be signed out when the browser is closed. (optional) (default: true)
+        callbackURL: "/", // An optional URL to redirect to after the user signs in. (optional)
+      });
+      console.log("sign-in submitted:", data)
+      toast.add({ title: `hello,${values.email}`, description: "sign-in successfull" })
       router.push("/");
       router.refresh();
     } catch (error) {
