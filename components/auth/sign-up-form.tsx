@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { uploadToImgBB } from "@/lib/imgbb";
 
 import {
   useState,
@@ -285,10 +286,16 @@ export function SignUpForm() {
     setIsSubmitting(true)
 
     try {
+       let imageUrl: string | undefined;
+
+    if (values.image) {
+      imageUrl = await uploadToImgBB(values.image);
+    }
       const { data, error } = await authClient.signUp.email({
         name: values.name.trim() as string,
         email: values.email.trim().toLowerCase() as string,
         password: values.password as string,
+        image:imageUrl as string,
         callbackURL: "/",
       })
 

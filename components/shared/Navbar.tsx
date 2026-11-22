@@ -23,10 +23,10 @@ const navLinks = [
 ]
 
 export default function Navbar() {
-  const {data:session}=authClient.useSession();
-  const user =session?.user;
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
-  const handleSignOut=async()=>{
+  const handleSignOut = async () => {
     await authClient.signOut();
   }
 
@@ -58,40 +58,41 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Authentication */}
-      <div className="hidden items-center gap-3 md:flex">
-  {user ? (
-    <div className="flex items-center gap-3">
-      <Image
-        src={user.image || "/default-avatar.png"}
-        alt={user.name || "User"}
-        width={36}
-        height={36}
-        className="rounded-full object-cover border-slate-500 border"
-      />
+        <div className="hidden items-center gap-3 md:flex">
+          {user ? (
+            <div className="flex items-center gap-3">
+              <Image
+                src={session.user.image || "/default-avatar.png"}
+                alt="Profile"
+                width={48}
+                height={48}
+                unoptimized
+                className="rounded-full"
+              />
 
-      <span className="text-sm font-medium">
-        {user.name}
-      </span>
-      <Button onClick={handleSignOut} className="text-2xl">Sign Out</Button>
-    </div>
-  ) : (
-    <>
-      <Link
-        href="/sign-in"
-        className="inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-      >
-        Sign In
-      </Link>
+              <span className="text-sm font-medium">
+                {user.name}
+              </span>
+              <Button onClick={handleSignOut} className="text-2xl">Sign Out</Button>
+            </div>
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                className="inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                Sign In
+              </Link>
 
-      <Link
-        href="/sign-up"
-        className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
-      >
-        Sign Up
-      </Link>
-    </>
-  )}
-</div>
+              <Link
+                href="/sign-up"
+                className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+        </div>
 
         {/* Mobile Navigation */}
         <div className="md:hidden">
