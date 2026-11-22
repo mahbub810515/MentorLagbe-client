@@ -1,10 +1,9 @@
+"use client"
 
-"use client";
+import Link from "next/link"
+import { GraduationCap, Menu } from "lucide-react"
 
-import Link from "next/link";
-import { GraduationCap, Menu } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
@@ -12,20 +11,19 @@ import {
   SheetTitle,
   SheetTrigger,
   SheetClose,
-} from "@/components/ui/sheet";
+} from "@/components/ui/sheet"
 
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Browse Tuitions", href: "/tuitions" },
   { name: "Pricing", href: "/pricing" },
   { name: "How It Works", href: "/about" },
-];
+]
 
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
@@ -70,7 +68,11 @@ export default function Navbar() {
         {/* Mobile Navigation */}
         <div className="md:hidden">
           <Sheet>
-            <SheetTrigger render={<Button variant="outline" size="icon" aria-label="Open menu" />}>
+            <SheetTrigger
+              render={
+                <Button variant="outline" size="icon" aria-label="Open menu" />
+              }
+            >
               <Menu className="h-5 w-5" />
             </SheetTrigger>
 
@@ -83,7 +85,10 @@ export default function Navbar() {
 
               <div className="mt-8 flex flex-col gap-3">
                 {navLinks.map((link) => (
-                  <SheetClose key={link.href} render={<Link href={link.href} />}>
+                  <SheetClose
+                    key={link.href}
+                    render={<Link href={link.href} />}
+                  >
                     <span className="block rounded-lg px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
                       {link.name}
                     </span>
@@ -108,8 +113,7 @@ export default function Navbar() {
             </SheetContent>
           </Sheet>
         </div>
-
       </nav>
     </header>
-  );
+  )
 }

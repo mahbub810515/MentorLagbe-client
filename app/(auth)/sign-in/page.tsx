@@ -1,9 +1,10 @@
-import React from 'react'
+import { AuthShell } from "@/components/auth/auth-shell"
+import { SignInForm } from "@/components/auth/sign-in-form"
 
-const SignInPage = () => {
+export default function SignInPage() {
   return (
-    <div>SignInPage</div>
+    <AuthShell>
+      <SignInForm />
+    </AuthShell>
   )
 }
-
-export default SignInPage

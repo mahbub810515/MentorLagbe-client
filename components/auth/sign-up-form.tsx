@@ -38,8 +38,6 @@ import { authClient } from "@/lib/auth-client"
 import { toast } from "../ui/toast"
 import { useRouter } from "next/navigation"
 
-
-
 type Role = "student" | "tutor"
 type Plan = "free" | "pro"
 
@@ -88,18 +86,17 @@ const roleOptions: Array<{
   label: string
   description: string
 }> = [
-    {
-      value: "student",
-      label: "Student",
-      description: "Find mentors and book sessions",
-    },
-    {
-      value: "tutor",
-      label: "Tutor",
-      description: "Teach learners and get paid",
-    },
-
-  ]
+  {
+    value: "student",
+    label: "Student",
+    description: "Find mentors and book sessions",
+  },
+  {
+    value: "tutor",
+    label: "Tutor",
+    description: "Teach learners and get paid",
+  },
+]
 
 const planOptions: Array<{
   value: Plan
@@ -107,18 +104,18 @@ const planOptions: Array<{
   description: string
   badge?: string
 }> = [
-    {
-      value: "free",
-      label: "Free",
-      description: "Standard matching, pay per session",
-    },
-    {
-      value: "pro",
-      label: "Pro",
-      description: "Priority matching and member perks",
-      badge: "Popular",
-    },
-  ]
+  {
+    value: "free",
+    label: "Free",
+    description: "Standard matching, pay per session",
+  },
+  {
+    value: "pro",
+    label: "Pro",
+    description: "Priority matching and member perks",
+    badge: "Popular",
+  },
+]
 
 const isRole = (value: unknown): value is Role =>
   typeof value === "string" &&
@@ -289,9 +286,9 @@ export function SignUpForm() {
 
     try {
       const { data, error } = await authClient.signUp.email({
-        name: values.name.trim(),
-        email: values.email.trim().toLowerCase(),
-        password: values.password,
+        name: values.name.trim() as string,
+        email: values.email.trim().toLowerCase() as string,
+        password: values.password as string,
         callbackURL: "/",
       })
 
@@ -306,7 +303,10 @@ export function SignUpForm() {
       }
 
       console.log("submited data:", data)
-      toast.add({ title: `hello,${values.name}`, description: "your account created successfully" })
+      toast.add({
+        title: `hello,${values.name}`,
+        description: "your account created successfully",
+      })
       router.push("/")
       router.refresh()
 
@@ -348,7 +348,6 @@ export function SignUpForm() {
           <FieldSeparator>or</FieldSeparator>
 
           <FieldGroup className="gap-5">
-
             <InputField
               id="name"
               label="Full name"
