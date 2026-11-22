@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+
 import {
   useState,
   type ComponentProps,
@@ -10,6 +11,7 @@ import {
 import { Eye, EyeOff, GraduationCap, Lock, Mail, User } from "lucide-react"
 
 import { GoogleButton } from "@/components/auth/google-button"
+import { ProfileImageField } from "@/components/auth/profile-image-field"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -32,8 +34,13 @@ import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
+import { toast } from "../ui/toast"
+import { useRouter } from "next/navigation"
 
-type Role = "student" | "tutor" | "admin"
+
+
+type Role = "student" | "tutor"
 type Plan = "free" | "pro"
 
 type FormValues = {
@@ -41,6 +48,7 @@ type FormValues = {
   email: string
   password: string
   confirmPassword: string
+  image: File | null
   role: Role | ""
   plan: Plan
   agreed: boolean
@@ -69,6 +77,7 @@ const initialValues: FormValues = {
   email: "",
   password: "",
   confirmPassword: "",
+  image: null,
   role: "",
   plan: "free",
   agreed: false,
@@ -79,22 +88,18 @@ const roleOptions: Array<{
   label: string
   description: string
 }> = [
-  {
-    value: "student",
-    label: "Student",
-    description: "Find mentors and book sessions",
-  },
-  {
-    value: "tutor",
-    label: "Tutor",
-    description: "Teach learners and get paid",
-  },
-  {
-    value: "admin",
-    label: "Admin",
-    description: "Manage the MentorLagbe platform",
-  },
-]
+    {
+      value: "student",
+      label: "Student",
+      description: "Find mentors and book sessions",
+    },
+    {
+      value: "tutor",
+      label: "Tutor",
+      description: "Teach learners and get paid",
+    },
+
+  ]
 
 const planOptions: Array<{
   value: Plan
@@ -102,18 +107,18 @@ const planOptions: Array<{
   description: string
   badge?: string
 }> = [
-  {
-    value: "free",
-    label: "Free",
-    description: "Standard matching, pay per session",
-  },
-  {
-    value: "pro",
-    label: "Pro",
-    description: "Priority matching and member perks",
-    badge: "Popular",
-  },
-]
+    {
+      value: "free",
+      label: "Free",
+      description: "Standard matching, pay per session",
+    },
+    {
+      value: "pro",
+      label: "Pro",
+      description: "Priority matching and member perks",
+      badge: "Popular",
+    },
+  ]
 
 const isRole = (value: unknown): value is Role =>
   typeof value === "string" &&
@@ -136,6 +141,12 @@ const validate = (values: FormValues): FormErrors => {
 
   if (values.confirmPassword !== values.password) {
     errors.confirmPassword = "Passwords do not match"
+  }
+
+  if (values.image && !values.image.type.startsWith("image/")) {
+    errors.image = "Please select an image file"
+  } else if (values.image && values.image.size > 5 * 1024 * 1024) {
+    errors.image = "Image must be 5 MB or smaller"
   }
 
   if (!values.role) {
@@ -244,11 +255,12 @@ function OptionCard({
 }
 
 export function SignUpForm() {
+  const router = useRouter()
   const [values, setValues] = useState<FormValues>(initialValues)
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const [submitError, setSubmitError] = useState("")
   const updateField = <K extends keyof FormValues>(
     key: K,
     value: FormValues[K]
@@ -261,8 +273,10 @@ export function SignUpForm() {
     setShowPassword((prev) => !prev)
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    setSubmitError("")
 
     const nextErrors = validate(values)
     setErrors(nextErrors)
@@ -271,14 +285,44 @@ export function SignUpForm() {
       return
     }
 
-    const payload = { ...values, role: values.role }
-
     setIsSubmitting(true)
 
-    window.setTimeout(() => {
+    try {
+      const { data, error } = await authClient.signUp.email({
+        name: values.name.trim(),
+        email: values.email.trim().toLowerCase(),
+        password: values.password,
+        callbackURL: "/",
+      })
+
+      if (error) {
+        setSubmitError(error.message || "Unable to create your account.")
+        return
+      }
+
+      if (!data) {
+        setSubmitError("Signup failed. Please try again.")
+        return
+      }
+
+      console.log("submited data:", data)
+      toast.add({ title: `hello,${values.name}`, description: "your account created successfully" })
+      router.push("/")
+      router.refresh()
+
+      // Better Auth handles the signup response.
+      // callbackURL controls the post-signup redirect.
+    } catch (error) {
+      console.error("Signup error:", error)
+
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      )
+    } finally {
       setIsSubmitting(false)
-      console.log("sign-up values", payload)
-    }, 1000)
+    }
   }
 
   return (
@@ -304,6 +348,7 @@ export function SignUpForm() {
           <FieldSeparator>or</FieldSeparator>
 
           <FieldGroup className="gap-5">
+
             <InputField
               id="name"
               label="Full name"
@@ -369,7 +414,10 @@ export function SignUpForm() {
                 />
               }
             />
-
+            <ProfileImageField
+              error={errors.image}
+              onChange={(file) => updateField("image", file)}
+            />
             <Field>
               <FieldTitle>I want to join as</FieldTitle>
               <FieldContent className="gap-2">

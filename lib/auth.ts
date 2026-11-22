@@ -1,11 +1,19 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, input } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 
-const client = new MongoClient(process.env.BETTER_AUTH_MONGODB_URI as string);
-const db = client.db();
+const client = new MongoClient(process.env.MONGODB_URI as string);
+const db = client.db("mentorlagbe");
 
 export const auth = betterAuth({
+  user:{
+    additionalFields:{
+      role:{
+        type:["Student","tutor",],
+        input:false,        
+      }
+    }
+  },
       //...other options
   emailAndPassword: { 
     enabled: true, 
