@@ -296,6 +296,8 @@ export function SignUpForm() {
         email: values.email.trim().toLowerCase() as string,
         password: values.password as string,
         image:imageUrl as string,
+        role:values.role,
+        plan:values.plan,
         callbackURL: "/",
       })
 

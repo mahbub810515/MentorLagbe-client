@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { GraduationCap, Menu } from "lucide-react"
+import { ChevronDown, GraduationCap, LayoutDashboard, LogOut, Menu, UserRound } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/sheet"
 import { authClient } from "@/lib/auth-client"
 import Image from "next/image"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { useRouter } from "next/navigation"
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -25,9 +27,13 @@ const navLinks = [
 export default function Navbar() {
   const { data: session } = authClient.useSession();
   const user = session?.user;
-
+  const router = useRouter()
   const handleSignOut = async () => {
-    await authClient.signOut();
+   const {error}= await authClient.signOut();
+   if(!error){
+    router.push("/sign-in")
+    router.refresh()
+   }
   }
 
   return (
@@ -69,11 +75,48 @@ export default function Navbar() {
                 unoptimized
                 className="rounded-full"
               />
+             
+              <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm">
+                  {user.name}
+                  <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
 
-              <span className="text-sm font-medium">
-                {user.name}
-              </span>
-              <Button onClick={handleSignOut} className="text-2xl">Sign Out</Button>
+                <DropdownMenuContent align="end" className="w-52">
+                  <div className="px-2 py-2">
+                    <p className="text-sm font-semibold">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {user.role}
+                    </p>
+                  </div>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem>
+                    <Link href="/dashboard">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem >
+                    <Link href="/profile">
+                      <UserRound className="mr-2 h-4 w-4" />
+                      Update Profile
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <>
