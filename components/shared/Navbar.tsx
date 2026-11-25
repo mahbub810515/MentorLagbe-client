@@ -93,7 +93,7 @@ export default function Navbar() {
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem>
-                    <Link href="/dashboard">
+                    <Link href={`/dashboard/${user.role}`}>
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Dashboard
                     </Link>
