@@ -1,10 +1,11 @@
 import BannerSection from "@/components/shared/Banner"
-import { Button } from "@/components/ui/button"
+import FeaturedTuitions from "@/components/shared/FeaturedTuitions"
 
 export default function Page() {
   return (
-    <div>
+    <main>
       <BannerSection />
-    </div>
+      <FeaturedTuitions />
+    </main>
   )
 }

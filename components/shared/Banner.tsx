@@ -55,7 +55,11 @@ const BannerSection = () => {
                 />
               </div>
 
-              <Button render={<Link href="/tuitions" />} className="h-12 px-6">
+              <Button
+                nativeButton={false}
+                render={<Link href="/tuitions" />}
+                className="h-12 px-6"
+              >
                 Browse Tuitions
                 <ArrowRight />
               </Button>
@@ -64,6 +68,7 @@ const BannerSection = () => {
             {/* CTA */}
             <div className="flex flex-wrap items-center gap-4">
               <Button
+                nativeButton={false}
                 render={<Link href="/tuitions" />}
                 size="lg"
                 className="h-11 px-7"
@@ -73,6 +78,7 @@ const BannerSection = () => {
               </Button>
 
               <Button
+                nativeButton={false}
                 render={<Link href="/sign-up" />}
                 variant="outline"
                 size="lg"

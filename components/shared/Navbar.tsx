@@ -170,6 +170,7 @@ export default function Navbar() {
                 {navLinks.map((link) => (
                   <SheetClose
                     key={link.href}
+                    nativeButton={false}
                     render={<Link href={link.href} />}
                   >
                     <span className="block rounded-lg px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
@@ -180,13 +181,19 @@ export default function Navbar() {
 
                 {/* Mobile Authentication */}
                 <div className="mt-5 flex flex-col gap-3 border-t pt-5">
-                  <SheetClose render={<Link href="/sign-in" />}>
+                  <SheetClose
+                    nativeButton={false}
+                    render={<Link href="/sign-in" />}
+                  >
                     <span className="flex h-10 w-full items-center justify-center rounded-md border text-sm font-medium hover:bg-accent">
                       Sign In
                     </span>
                   </SheetClose>
 
-                  <SheetClose render={<Link href="/sign-up" />}>
+                  <SheetClose
+                    nativeButton={false}
+                    render={<Link href="/sign-up" />}
+                  >
                     <span className="flex h-10 w-full items-center justify-center rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90">
                       Sign Up
                     </span>
