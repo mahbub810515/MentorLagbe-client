@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react"
 
 const TutorDashboardPage = () => {
-  return (
-    <div>TutorDashboardPage</div>
-  )
+  return <div>TutorDashboardPage</div>
 }
 
 export default TutorDashboardPage

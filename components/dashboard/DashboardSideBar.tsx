@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import {
   Sidebar,
   SidebarContent,
@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth-client"
 
 import {
   LayoutDashboard,
@@ -21,7 +21,8 @@ import {
   BookOpen,
   ClipboardList,
   CreditCard,
-} from "lucide-react";
+} from "lucide-react"
+import Link from "next/link"
 
 export const dashboardMenuItem = {
   student: [
@@ -87,24 +88,25 @@ export const dashboardMenuItem = {
       icon: CreditCard,
     },
   ],
-};
+}
 export function DashboardSideBar() {
-  const {data:session,isPending} = useSession();
-  if(isPending) return <p>Loading...</p>
-  const role = session?.user?.role as keyof typeof dashboardMenuItem || "student";
-  const menuItems= dashboardMenuItem[role] ?? [];
-  console.log("session:", session);
-  console.log("menuItems:",menuItems)
+  const { data: session, isPending } = useSession()
+  if (isPending) return <p>Loading...</p>
+  const role =
+    (session?.user?.role as keyof typeof dashboardMenuItem) || "student"
+  const menuItems = dashboardMenuItem[role] ?? []
+  console.log("session:", session)
+  console.log("menuItems:", menuItems)
 
   return (
     <Sidebar>
       <SidebarHeader />
-      <SidebarContent>
+      <SidebarContent className="pt-10">
         <SidebarGroup />
         <SidebarMenu>
-          {menuItems.map((item,index) => (
+          {menuItems.map((item, index) => (
             <SidebarMenuItem key={index}>
-              <SidebarMenuButton render={<a href={item.link} />}>
+              <SidebarMenuButton render={<Link href={item.link} />}>
                 <item.icon />
                 <span>{item.name}</span>
               </SidebarMenuButton>

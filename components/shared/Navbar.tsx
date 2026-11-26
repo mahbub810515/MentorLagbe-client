@@ -1,7 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { ChevronDown, GraduationCap, LayoutDashboard, LogOut, Menu, UserRound } from "lucide-react"
+import {
+  ChevronDown,
+  GraduationCap,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  UserRound,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +21,13 @@ import {
 } from "@/components/ui/sheet"
 import { authClient } from "@/lib/auth-client"
 import Image from "next/image"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 
 const navLinks = [
@@ -25,15 +38,15 @@ const navLinks = [
 ]
 
 export default function Navbar() {
-  const { data: session } = authClient.useSession();
-  const user = session?.user;
+  const { data: session } = authClient.useSession()
+  const user = session?.user
   const router = useRouter()
   const handleSignOut = async () => {
-   const {error}= await authClient.signOut();
-   if(!error){
-    router.push("/sign-in")
-    router.refresh()
-   }
+    const { error } = await authClient.signOut()
+    if (!error) {
+      router.push("/sign-in")
+      router.refresh()
+    }
   }
 
   return (
@@ -75,7 +88,7 @@ export default function Navbar() {
                 unoptimized
                 className="rounded-full"
               />
-             
+
               <DropdownMenu>
                 <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm">
                   {user.name}
@@ -85,9 +98,7 @@ export default function Navbar() {
                 <DropdownMenuContent align="end" className="w-52">
                   <div className="px-2 py-2">
                     <p className="text-sm font-semibold">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {user.role}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{user.role}</p>
                   </div>
 
                   <DropdownMenuSeparator />
@@ -99,7 +110,7 @@ export default function Navbar() {
                     </Link>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem >
+                  <DropdownMenuItem>
                     <Link href="/profile">
                       <UserRound className="mr-2 h-4 w-4" />
                       Update Profile

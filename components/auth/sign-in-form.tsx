@@ -166,17 +166,20 @@ export function SignInForm() {
     setIsSubmitting(true)
 
     try {
-      // TODO: wire up Better Auth sign-in here  
+      // TODO: wire up Better Auth sign-in here
       const { data, error } = await authClient.signIn.email({
         email: values.email.trim().toLowerCase() as string, // required, The email address of the user.
         password: values.password as string, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
         rememberMe: values.remember, // If false, the user will be signed out when the browser is closed. (optional) (default: true)
         callbackURL: "/", // An optional URL to redirect to after the user signs in. (optional)
-      });
+      })
       console.log("sign-in submitted:", data)
-      toast.add({ title: `hello,${values.email}`, description: "sign-in successfull" })
-      router.push("/");
-      router.refresh();
+      toast.add({
+        title: `hello,${values.email}`,
+        description: "sign-in successfull",
+      })
+      router.push("/")
+      router.refresh()
     } catch (error) {
       console.error("Sign-in error:", error)
 

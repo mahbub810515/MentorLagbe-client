@@ -7,21 +7,21 @@ const db = client.db("mentorlagbe")
 
 export const auth = betterAuth({
   user: {
-  additionalFields: {
-    role: {
-      type: ["student", "tutor"],
-      required: true,
-      defaultValue: "student",
-      input: true,
-    },
-    plan: {
-      type: ["free", "pro"],
-      required: true,
-      defaultValue: "free",
-      input: true,
+    additionalFields: {
+      role: {
+        type: ["student", "tutor"],
+        required: true,
+        defaultValue: "student",
+        input: true,
+      },
+      plan: {
+        type: ["free", "pro"],
+        required: true,
+        defaultValue: "free",
+        input: true,
+      },
     },
   },
-},
   //...other options
   emailAndPassword: {
     enabled: true,
