@@ -1,12 +1,14 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-
 import TuitionCard from "@/components/shared/TuitionCard"
 import { Button } from "@/components/ui/button"
-import { getFeaturedTuitions } from "@/lib/tuitions"
+import { TuitionType } from "@/types/TutionType"
 
-const FeaturedTuitions = async () => {
-  const tuitions = await getFeaturedTuitions()
+const FeaturedTuitions = async () => {   
+  
+  const res = await fetch(`${process.env.BETTER_AUTH_API_URL}/tutor/post-tuition`);
+  const tuitions:TuitionType[] =await res.json();
+  
 
   return (
     <section className="border-b bg-background">
@@ -44,8 +46,8 @@ const FeaturedTuitions = async () => {
           </div>
         ) : (
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {tuitions.map((tuition) => (
-              <TuitionCard key={tuition.id} tuition={tuition} />
+            {tuitions.slice(0,6).map((tuition) => (
+              <TuitionCard key={tuition._id} tuition={tuition} />
             ))}
           </div>
         )}
