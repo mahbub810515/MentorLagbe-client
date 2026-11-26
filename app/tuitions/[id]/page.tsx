@@ -1,25 +1,38 @@
+import type { Metadata } from "next"
+import { notFound } from "next/navigation"
+
+import TuitionDetails from "@/components/shared/TuitionDetails"
+import { getTuitionById } from "@/lib/tuitions"
+
 interface TuitionDetailsPageProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>
 }
 
-const TuitionDetailsPage = async ({
+export async function generateMetadata({
   params,
-}: TuitionDetailsPageProps) => {
-  const { id } = await params;
+}: TuitionDetailsPageProps): Promise<Metadata> {
+  const { id } = await params
+  const tuition = await getTuitionById(id)
 
-  return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold">
-        Tuition Details
-      </h1>
+  if (!tuition) {
+    return { title: "Tuition Not Found | MentorLagbe" }
+  }
 
-      <p className="mt-4 text-gray-600">
-        Tuition ID: {id}
-      </p>
-    </div>
-  );
-};
+  return {
+    title: `${tuition.title} | MentorLagbe`,
+    description: tuition.description.slice(0, 160),
+  }
+}
 
-export default TuitionDetailsPage;
+export default async function TuitionDetailsPage({
+  params,
+}: TuitionDetailsPageProps) {
+  const { id } = await params
+  const tuition = await getTuitionById(id)
+
+  if (!tuition) {
+    notFound()
+  }
+
+  return <TuitionDetails tuition={tuition} />
+}
