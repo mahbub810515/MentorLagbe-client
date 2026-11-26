@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb"
+import { ObjectId, type Filter } from "mongodb"
 import { cache } from "react"
 import { connection } from "next/server"
 
@@ -7,6 +7,8 @@ import clientPromise from "@/lib/mongodb"
 const DB_NAME = "mentorlagbe"
 const TUITION_COLLECTION = "tuition"
 const USER_COLLECTION = "user"
+
+const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" })
 
 export type TuitionMode = "Online" | "Offline"
 
@@ -45,6 +47,18 @@ export interface FeaturedTuition {
   tutorName: string
 }
 
+export interface TuitionQuery {
+  query?: string
+  subject?: string
+  classLevel?: string
+  mode?: TuitionMode
+}
+
+export interface TuitionFilterOptions {
+  subjects: string[]
+  classLevels: string[]
+}
+
 export interface TuitionDetail {
   id: string
   title: string
@@ -67,33 +81,96 @@ export interface TuitionDetail {
   }
 }
 
-export async function getFeaturedTuitions(
-  limit = 6
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+function toFeaturedTuition(doc: TuitionDocument): FeaturedTuition {
+  return {
+    id: String(doc._id),
+    title: doc.title,
+    subject: doc.subject,
+    classLevel: doc.classLevel,
+    mode: doc.mode,
+    monthlyFee: doc.monthlyFee,
+    tutorName: doc.tutorName,
+  }
+}
+
+export async function getApprovedTuitions(
+  query: TuitionQuery = {},
+  limit?: number
 ): Promise<FeaturedTuition[]> {
   await connection()
 
   try {
     const client = await clientPromise
-    const documents = await client
+    const collection = client
       .db(DB_NAME)
       .collection<TuitionDocument>(TUITION_COLLECTION)
-      .find({ approvalStatus: "approved", isActive: true })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .toArray()
 
-    return documents.map((doc) => ({
-      id: String(doc._id),
-      title: doc.title,
-      subject: doc.subject,
-      classLevel: doc.classLevel,
-      mode: doc.mode,
-      monthlyFee: doc.monthlyFee,
-      tutorName: doc.tutorName,
-    }))
+    const filter: Filter<TuitionDocument> = {
+      approvalStatus: "approved",
+      isActive: true,
+    }
+
+    if (query.query) {
+      const pattern = new RegExp(escapeRegExp(query.query), "i")
+      filter.$or = [{ title: pattern }, { subject: pattern }]
+    }
+    if (query.subject) {
+      filter.subject = query.subject
+    }
+    if (query.classLevel) {
+      filter.classLevel = query.classLevel
+    }
+    if (query.mode) {
+      filter.mode = query.mode
+    }
+
+    const cursor = collection.find(filter).sort({ createdAt: -1 })
+    if (limit) {
+      cursor.limit(limit)
+    }
+    const documents = await cursor.toArray()
+
+    return documents.map(toFeaturedTuition)
   } catch (error) {
-    console.error("Failed to load featured tuitions:", error)
+    console.error("Failed to load tuitions:", error)
     return []
+  }
+}
+
+export function getFeaturedTuitions(limit = 6): Promise<FeaturedTuition[]> {
+  return getApprovedTuitions({}, limit)
+}
+
+export async function getTuitionFilterOptions(): Promise<TuitionFilterOptions> {
+  await connection()
+
+  try {
+    const client = await clientPromise
+    const collection = client
+      .db(DB_NAME)
+      .collection<TuitionDocument>(TUITION_COLLECTION)
+
+    const base: Filter<TuitionDocument> = {
+      approvalStatus: "approved",
+      isActive: true,
+    }
+
+    const [subjects, classLevels] = await Promise.all([
+      collection.distinct("subject", base),
+      collection.distinct("classLevel", base),
+    ])
+
+    return {
+      subjects: subjects.map(String).sort(collator.compare),
+      classLevels: classLevels.map(String).sort(collator.compare),
+    }
+  } catch (error) {
+    console.error("Failed to load tuition filter options:", error)
+    return { subjects: [], classLevels: [] }
   }
 }
 
