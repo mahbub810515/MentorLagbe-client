@@ -22,7 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { TuitionDetail } from "@/lib/tuitions"
+import { TuitionType } from "@/types/TutionType"
 
 const feeFormatter = new Intl.NumberFormat("en-US")
 const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" })
@@ -33,7 +33,8 @@ function formatDate(value?: string) {
   return Number.isNaN(date.getTime()) ? null : dateFormatter.format(date)
 }
 
-function getInitials(name: string) {
+function getInitials(name?: string) {
+  if (!name) return ""
   return name
     .split(" ")
     .filter(Boolean)
@@ -42,13 +43,16 @@ function getInitials(name: string) {
     .join("")
 }
 
-export default function TuitionDetails({
-  tuition,
-}: {
-  tuition: TuitionDetail
-}) {
+export default function TuitionDetails({ tuition }: { tuition: TuitionType }) {
   const isOnline = tuition.mode === "Online"
   const postedAt = formatDate(tuition.createdAt)
+
+  const tutor = {
+    name: tuition.tutor?.name ?? tuition.tutorName ?? "",
+    email: tuition.tutor?.email ?? tuition.tutorEmail ?? "",
+    image: tuition.tutor?.image,
+    plan: tuition.tutor?.plan,
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -146,25 +150,25 @@ export default function TuitionDetails({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
-                {tuition.tutor.image ? (
+                {tutor.image ? (
                   <Image
-                    src={tuition.tutor.image}
-                    alt={tuition.tutor.name}
+                    src={tutor.image}
+                    alt={tutor.name}
                     width={56}
                     height={56}
                     className="size-14 rounded-full object-cover"
                   />
                 ) : (
                   <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
-                    {getInitials(tuition.tutor.name)}
+                    {getInitials(tutor.name)}
                   </div>
                 )}
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-foreground">
-                    {tuition.tutor.name}
+                    {tutor.name}
                   </p>
                   <p className="truncate text-sm text-muted-foreground">
-                    {tuition.tutor.email}
+                    {tutor.email}
                   </p>
                 </div>
               </div>
@@ -174,9 +178,9 @@ export default function TuitionDetails({
                   <UserRound />
                   Tutor
                 </Badge>
-                {tuition.tutor.plan ? (
+                {tutor.plan ? (
                   <Badge variant="secondary" className="capitalize">
-                    {tuition.tutor.plan}
+                    {tutor.plan}
                   </Badge>
                 ) : null}
               </div>

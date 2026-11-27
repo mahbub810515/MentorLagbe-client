@@ -4,11 +4,8 @@ import Link from "next/link"
 import TuitionCard from "@/components/shared/TuitionCard"
 import TuitionFilters from "@/components/shared/TuitionFilters"
 import { Button } from "@/components/ui/button"
-import {
-  getApprovedTuitions,
-  getTuitionFilterOptions,
-  type TuitionMode,
-} from "@/lib/tuitions"
+import { getTuitionData } from "@/lib/api/tuitions"
+import type { TuitionType } from "@/types/TutionType"
 
 export const metadata: Metadata = {
   title: "Browse Tuitions | MentorLagbe",
@@ -24,23 +21,45 @@ function first(value: string | string[] | undefined) {
   return typeof value === "string" ? value : undefined
 }
 
+const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" })
+
 export default async function TuitionsPage({
   searchParams,
 }: TuitionsPageProps) {
   const params = await searchParams
 
-  const query = first(params.q)?.trim() || undefined
+  const rawQuery = first(params.q)?.trim() || undefined
+  const query = rawQuery?.toLowerCase()
   const subject = first(params.subject) || undefined
   const classLevel = first(params.classLevel) || undefined
 
   const rawMode = first(params.mode)
-  const mode: TuitionMode | undefined =
+  const mode: TuitionType["mode"] | undefined =
     rawMode === "Online" || rawMode === "Offline" ? rawMode : undefined
 
-  const [tuitions, options] = await Promise.all([
-    getApprovedTuitions({ query, subject, classLevel, mode }),
-    getTuitionFilterOptions(),
-  ])
+  const allTuitions = (await getTuitionData()).filter(
+    (tuition) => tuition.approvalStatus === "approved" && tuition.isActive
+  )
+
+  const tuitions = allTuitions.filter((tuition) => {
+    if (query) {
+      const haystack = `${tuition.title} ${tuition.subject}`.toLowerCase()
+      if (!haystack.includes(query)) return false
+    }
+    if (subject && tuition.subject !== subject) return false
+    if (classLevel && tuition.classLevel !== classLevel) return false
+    if (mode && tuition.mode !== mode) return false
+    return true
+  })
+
+  const options = {
+    subjects: Array.from(new Set(allTuitions.map((item) => item.subject))).sort(
+      collator.compare
+    ),
+    classLevels: Array.from(
+      new Set(allTuitions.map((item) => item.classLevel))
+    ).sort(collator.compare),
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -58,7 +77,7 @@ export default async function TuitionsPage({
         <TuitionFilters
           subjects={options.subjects}
           classLevels={options.classLevels}
-          q={query ?? ""}
+          q={rawQuery ?? ""}
           subject={subject ?? ""}
           classLevel={classLevel ?? ""}
           mode={mode ?? ""}
@@ -87,7 +106,7 @@ export default async function TuitionsPage({
       ) : (
         <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {tuitions.map((tuition) => (
-            <TuitionCard key={tuition.id} tuition={tuition} />
+            <TuitionCard key={tuition._id} tuition={tuition} />
           ))}
         </div>
       )}

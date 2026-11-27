@@ -19,11 +19,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { FeaturedTuition } from "@/lib/tuitions"
+
+import { TuitionType } from "@/types/TutionType"
 
 const feeFormatter = new Intl.NumberFormat("en-US")
 
-export default function TuitionCard({ tuition }: { tuition: FeaturedTuition }) {
+export default function TuitionCard({ tuition }: { tuition: TuitionType }) {
   const isOnline = tuition.mode === "Online"
 
   return (
@@ -62,7 +63,7 @@ export default function TuitionCard({ tuition }: { tuition: FeaturedTuition }) {
         <Button
           nativeButton={false}
           className="w-full"
-          render={<Link href={`/tuitions/${tuition.id}`} />}
+          render={<Link href={`/tuitions/${tuition._id}`} />}
         >
           View Details
           <ArrowRight />
